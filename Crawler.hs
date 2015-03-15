@@ -4,13 +4,14 @@ import Network.Browser
 
 main = do 
   print "Crawler Main starting..."
-  urls <- getArgs
-  return $ checkUrls urls
-  print $ head urls ++ " will be crawled"
+  print "Please type in a url to crawl: "
+  urls <- getLine
+  return $ checkUrls [urls]
+  print $ urls ++ " will be crawled"
   (_, rsp)
          <- Network.Browser.browse $ do
                setAllowRedirects True -- handle HTTP redirects
-               request $ getRequest $ head urls
+               request $ getRequest $ urls
   print $ getLinks $ rspBody rsp
 
 checkUrls :: [String] -> ()
