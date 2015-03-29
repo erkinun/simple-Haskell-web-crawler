@@ -2,6 +2,7 @@ import System.Environment
 import Network.HTTP
 import Network.URI
 import Network.Browser
+import Text.Regex.Posix
 
 main = do 
   print "Crawler Main starting..."
@@ -13,7 +14,7 @@ main = do
 
   (_, rsp) <- getPageContent urls
 
-  print $ getLinks $ rspBody rsp
+  print $ getHref $ head $ getLinks $ rspBody rsp
   main
 
 checkUrls :: [String] -> ()
@@ -23,7 +24,12 @@ checkUrls urls
           | otherwise = ()
 
 getLinks :: String -> [String]
-getLinks str = [str]
+getLinks str = getAllTextMatches $ str =~ "<a.*>.*</a>" :: [String]
+
+getHref :: String -> String
+getHref [] = "empty link"
+getHref url  = init $ drop 6 $ head href
+                where href = getAllTextMatches $ url =~ "href=\"[a-zA-Z0-9:/\\.]*\"" :: [String]
 
 getPageContent :: String -> IO (Network.URI.URI, Response String)
 getPageContent url = Network.Browser.browse $ do
